@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>RMS Super App V11</title>
+<title>RMS Super App V12</title>
 <!-- PWA Support -->
 <link rel="manifest" href="manifest.json"/>
 <meta name="theme-color" content="#6366f1"/>
@@ -30,7 +30,7 @@
 /* ── MIDNIGHT THEME (default) ── */
 
 /* ══════════════════════════════════════════════════════════
-   RMS SUPER APP V11 — THEME SYSTEM
+   RMS SUPER APP V12 — THEME SYSTEM
    3 themes: midnight (default), rms (light), auto (system)
    Sidebar + main ALWAYS share the same CSS variables.
    --sb-bg/sb-text = sidebar colours (always dark for contrast)
@@ -1508,6 +1508,204 @@ tbody tr.pnr-dup td:nth-child(8) input{background:#2a1500!important;border-color
 .set-tab-btn{white-space:nowrap;font-size:11px;}
 @media(max-width:600px){.set-tab-bar{flex-wrap:wrap;}.set-tab-btn{flex:none;padding:7px 8px;}}
 
+/* Dashboard styling */
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.dash-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.dash-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 8px 30px rgba(var(--accent-rgb), 0.15);
+}
+.dash-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.dash-card-info {
+  flex: 1;
+}
+.dash-card-val {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--text);
+}
+.dash-card-lbl {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+.dash-row {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+@media (max-width: 900px) {
+  .dash-row {
+    grid-template-columns: 1fr;
+  }
+}
+.route-item {
+  margin-bottom: 14px;
+}
+.route-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.route-bar-bg {
+  height: 8px;
+  background: var(--bg2);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.route-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+  border-radius: 99px;
+  width: 0%;
+  transition: width 0.8s ease;
+}
+.sync-health-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.health-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+/* Print styles for Receipt Generator */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #receipt-print-area, #receipt-print-area * {
+    visibility: visible;
+  }
+  #receipt-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white !important;
+    color: black !important;
+    padding: 20px;
+  }
+  /* Hide print buttons and modals during print */
+  #receiptModal .modal-ft, #receiptModal .btn-icon, #receiptModal .modal-hd button {
+    display: none !important;
+  }
+  .modal-wrap {
+    position: absolute;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+  }
+  .modal {
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+    color: black !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Receipt Modal Styles (Screen mode) */
+.receipt-layout {
+  font-family: 'Outfit', sans-serif;
+  color: var(--text);
+  padding: 10px;
+}
+.receipt-header {
+  text-align: center;
+  border-bottom: 2px dashed var(--border);
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+.receipt-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent);
+}
+.receipt-subtitle {
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 4px;
+}
+.receipt-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.receipt-label {
+  font-size: 11px;
+  color: var(--text2);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.receipt-val {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+.receipt-passengers {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--surface2);
+  margin-bottom: 16px;
+}
+.receipt-footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text2);
+  border-top: 1px dashed var(--border);
+  padding-top: 14px;
+  margin-top: 20px;
+  line-height: 1.6;
+}
+
 </style>
 </head>
 <body>
@@ -1530,7 +1728,12 @@ tbody tr.pnr-dup td:nth-child(8) input{background:#2a1500!important;border-color
   </div>
 
   <nav class="sb-nav">
-    <div class="sb-nav-item active" data-page="calendar" data-label="Order Calendar">
+    <div class="sb-nav-item active" data-page="dashboard" data-label="Dashboard">
+      <div class="sb-nav-icon"><i class="fas fa-chart-line"></i></div>
+      <span class="sb-label">Dashboard</span>
+      <span class="sb-kbd">Alt+D</span>
+    </div>
+    <div class="sb-nav-item" data-page="calendar" data-label="Order Calendar">
       <div class="sb-nav-icon"><i class="fas fa-calendar-alt"></i></div>
       <span class="sb-label">Order Calendar</span>
       <span class="sb-kbd">Alt+C</span>
@@ -1541,28 +1744,20 @@ tbody tr.pnr-dup td:nth-child(8) input{background:#2a1500!important;border-color
       <span class="sb-label">ID Manager</span>
       <span class="sb-kbd">Alt+I</span>
     </div>
-    <!-- ── TRAIN GROUP ── -->
-    <div class="sb-nav-item sb-train-toggle" id="sb-train-toggle" data-label="Train Tools">
-      <div class="sb-nav-icon"><i class="fas fa-train"></i></div>
-      <span class="sb-label">Train Tools</span>
-      <span class="sb-kbd">Alt+T</span>
-      <i class="fas fa-chevron-down sb-train-arrow" id="sb-train-arrow" style="font-size:9px;margin-left:auto;transition:transform .2s;"></i>
+    <div class="sb-nav-item" data-page="pnr" data-label="PNR Status">
+      <div class="sb-nav-icon"><i class="fas fa-ticket-alt"></i></div>
+      <span class="sb-label">PNR Status</span>
+      <span class="sb-kbd">Alt+P</span>
     </div>
-    <div class="sb-train-sub" id="sb-train-sub">
-      <div class="sb-nav-item sb-nav-sub" data-page="pnr" data-label="PNR Status">
-        <div class="sb-nav-icon"><i class="fas fa-ticket-alt"></i></div>
-        <span class="sb-label">PNR Status</span>
-        <span class="sb-kbd" style="font-size:9px;">Alt+P</span>
-      </div>
-      <div class="sb-nav-item sb-nav-sub" data-page="live" data-label="Live Running">
-        <div class="sb-nav-icon"><i class="fas fa-satellite-dish"></i></div>
-        <span class="sb-label">Live Running</span>
-        <span class="sb-kbd" style="font-size:9px;">Alt+L</span>
-      </div>
-      <div class="sb-nav-item sb-nav-sub" data-page="avail" data-label="Availability">
-        <div class="sb-nav-icon"><i class="fas fa-chair"></i></div>
-        <span class="sb-label">Availability</span>
-      </div>
+    <div class="sb-nav-item" data-page="live" data-label="Live Running">
+      <div class="sb-nav-icon"><i class="fas fa-satellite-dish"></i></div>
+      <span class="sb-label">Live Running</span>
+      <span class="sb-kbd">Alt+L</span>
+    </div>
+    <div class="sb-nav-item" data-page="avail" data-label="Seat Availability">
+      <div class="sb-nav-icon"><i class="fas fa-chair"></i></div>
+      <span class="sb-label">Seat Availability</span>
+      <span class="sb-kbd">Alt+A</span>
     </div>
     <div class="sb-nav-sep"></div>
     <div class="sb-nav-item" data-page="batch" data-label="Batch Processor">
@@ -1628,8 +1823,88 @@ tbody tr.pnr-dup td:nth-child(8) input{background:#2a1500!important;border-color
   <!-- Content area -->
   <div id="content">
 
+    <!-- ══ DASHBOARD PAGE ══ -->
+    <div class="page active" id="page-dashboard">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+        <div>
+          <h2 style="font-size:24px;font-weight:900;color:var(--text);margin:0;">Dashboard</h2>
+          <div style="font-size:12px;color:var(--text2);">Real-time operations & stats overview</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" id="dash-refresh-btn"><i class="fas fa-sync-alt"></i> Refresh Stats</button>
+          <button class="btn btn-accent btn-sm" onclick="performTwoWaySync()"><i class="fas fa-cloud-upload-alt"></i> Sync Data</button>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-card-icon" style="background:rgba(99,102,241,0.12);color:var(--accent);"><i class="fas fa-ticket-alt"></i></div>
+          <div class="dash-card-info">
+            <div class="dash-card-val" id="dash-bookings-val">0</div>
+            <div class="dash-card-lbl">Tickets Processed</div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-icon" style="background:rgba(16,185,129,0.12);color:var(--green);"><i class="fas fa-rupee-sign"></i></div>
+          <div class="dash-card-info">
+            <div class="dash-card-val" id="dash-fare-val">₹0</div>
+            <div class="dash-card-lbl">Fare Volume</div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-icon" style="background:rgba(139,92,246,0.12);color:var(--purple);"><i class="fas fa-wallet"></i></div>
+          <div class="dash-card-info">
+            <div class="dash-card-val" id="dash-comm-val">₹0</div>
+            <div class="dash-card-lbl">Commission Earned</div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-icon" style="background:rgba(245,158,11,0.12);color:var(--amber);"><i class="fas fa-key"></i></div>
+          <div class="dash-card-info">
+            <div class="dash-card-val" id="dash-ids-val">0</div>
+            <div class="dash-card-lbl">Active IDs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lower Section -->
+      <div class="dash-row">
+        <!-- Popular Routes -->
+        <div class="card card-pad">
+          <div class="section-hd"><i class="fas fa-route"></i> Popular Routes Breakdown</div>
+          <div id="dash-routes-list" style="margin-top:16px;">
+            <div style="text-align:center;padding:32px;color:var(--text3);">No tickets processed yet to extract route data.</div>
+          </div>
+        </div>
+        
+        <!-- System Health / Sync -->
+        <div class="card card-pad">
+          <div class="section-hd"><i class="fas fa-server"></i> System Health & Sync</div>
+          <div class="sync-health-box" style="margin-top:16px;">
+            <div class="health-row">
+              <span style="font-weight:600;font-size:12px;">Sync URL configured</span>
+              <span id="dash-health-gas" class="badge b-red">No</span>
+            </div>
+            <div class="health-row">
+              <span style="font-weight:600;font-size:12px;">PWA Offline Queue</span>
+              <span id="dash-health-queue" class="badge b-gray">0 pending</span>
+            </div>
+            <div class="health-row">
+              <span style="font-weight:600;font-size:12px;">Last Backup status</span>
+              <span id="dash-health-backup" style="font-size:11px;color:var(--text2);">Never</span>
+            </div>
+            <div class="health-row">
+              <span style="font-weight:600;font-size:12px;">Linked Doc Count</span>
+              <span id="dash-health-links" class="badge b-blue" style="font-weight:bold;">0 links</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ══ CALENDAR PAGE ══ -->
-    <div class="page active" id="page-calendar">
+    <div class="page" id="page-calendar">
 
       <!-- Top controls -->
       <div class="cal-topbar">
@@ -2624,27 +2899,26 @@ tbody tr.pnr-dup td:nth-child(8) input{background:#2a1500!important;border-color
 
 <!-- Delta Modal -->
 <div class="modal-wrap" id="deltaModal">
-  <div class="modal" style="max-width:520px;">
+  <div class="modal" style="max-width:440px;">
     <div class="modal-hd">
-      <div class="modal-title">📋 Sync Changes Detected</div>
+      <div class="modal-title" style="display:flex;align-items:center;gap:8px;">
+        <span style="color:var(--accent);"><i class="fas fa-sync-alt"></i></span>
+        Google Sheet Update Available
+      </div>
       <button class="btn-icon btn-sm" onclick="closeModal('deltaModal')"><i class="fas fa-times"></i></button>
     </div>
-    <div class="modal-body">
-      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;" id="deltaSubtitle"></p>
-      <div id="deltaSheetSec" style="display:none;margin-bottom:12px;">
-        <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;margin-bottom:6px;">📊 Sheet → App (newer on Sheet)</div>
-        <div id="deltaSheetList" style="max-height:150px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;"></div>
-      </div>
-      <div id="deltaAppSec" style="display:none;margin-bottom:12px;">
-        <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:6px;">📱 App → Sheet (newer in App)</div>
-        <div id="deltaAppList" style="max-height:150px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;"></div>
+    <div class="modal-body" style="padding-top:10px;">
+      <p style="font-size:13.5px;color:var(--text2);line-height:1.6;margin-bottom:14px;" id="deltaSubtitle">Newer or different credential data detected on your Google Sheet. Do you want to update your local app data to match the Google Sheet?</p>
+      <div style="background:rgba(var(--accent-rgb),0.06);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;color:var(--text2);">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <i class="fas fa-info-circle" style="color:var(--accent);font-size:14px;"></i>
+          <span>This will pull credentials from the sheet and update your local list.</span>
+        </div>
       </div>
     </div>
-    <div class="modal-ft" style="flex-wrap:wrap;gap:6px;">
-      <button class="btn btn-ghost btn-sm" id="deltaDismiss">Dismiss</button>
-      <button class="btn btn-ghost btn-sm" id="deltaSheetOnly" style="display:none;">Pull Sheet Only</button>
-      <button class="btn btn-ghost btn-sm" id="deltaAppOnly" style="display:none;">Push App Only</button>
-      <button class="btn btn-accent btn-sm" id="deltaAcceptAll">Accept All &amp; Sync</button>
+    <div class="modal-ft" style="gap:8px;justify-content:flex-end;margin-top:10px;">
+      <button class="btn btn-ghost btn-sm" id="deltaDismiss">Keep Local</button>
+      <button class="btn btn-accent btn-sm" id="deltaAcceptAll"><i class="fas fa-download"></i> Update App Data</button>
     </div>
   </div>
 </div>
@@ -2847,6 +3121,80 @@ tbody tr.pnr-dup td:nth-child(8) input{background:#2a1500!important;border-color
   </div>
 </div>
 
+<!-- ════ TICKET RECEIPT MODAL ════ -->
+<div class="modal-wrap" id="receiptModal">
+  <div class="modal" style="max-width:550px;">
+    <div class="modal-hd">
+      <div class="modal-title" style="display:flex;align-items:center;gap:8px;">
+        <span style="color:var(--accent);font-size:18px;"><i class="fas fa-file-invoice"></i></span>
+        Generate Branded Receipt
+      </div>
+      <button class="btn-icon btn-sm" onclick="closeModal('receiptModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="receipt-print-area">
+      <div class="receipt-layout">
+        <!-- Branded Header -->
+        <div class="receipt-header">
+          <div class="receipt-title" id="rc-store-name">Ravi Medical & General Store</div>
+          <div class="receipt-subtitle" id="rc-tagline">Your One Stop Shop</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:6px;" id="rc-contact-info">Contact: 9898393487</div>
+        </div>
+
+        <!-- Receipt Info Grid -->
+        <div class="receipt-info-grid">
+          <div>
+            <div class="receipt-label">PNR Number</div>
+            <div class="receipt-val" id="rc-pnr" style="font-size:15px;color:var(--accent);letter-spacing:0.05em;">-</div>
+          </div>
+          <div>
+            <div class="receipt-label">Booking Date</div>
+            <div class="receipt-val" id="rc-booking-date">-</div>
+          </div>
+          <div>
+            <div class="receipt-label">Train Details</div>
+            <div class="receipt-val" id="rc-train-details">-</div>
+          </div>
+          <div>
+            <div class="receipt-label">Journey Date</div>
+            <div class="receipt-val" id="rc-journey-date">-</div>
+          </div>
+          <div>
+            <div class="receipt-label">From Station</div>
+            <div class="receipt-val" id="rc-from">-</div>
+          </div>
+          <div>
+            <div class="receipt-label">To Station</div>
+            <div class="receipt-val" id="rc-to">-</div>
+          </div>
+        </div>
+
+        <!-- Passengers -->
+        <div class="receipt-passengers">
+          <div class="receipt-label" style="margin-bottom:8px;">Passenger & Class Info</div>
+          <div id="rc-passenger-name" style="font-size:13px;font-weight:600;line-height:1.6;white-space:pre-wrap;">-</div>
+        </div>
+
+        <!-- Fare block -->
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(var(--accent-rgb),0.06);border:1.5px solid var(--border);border-radius:10px;margin-bottom:16px;">
+          <div>
+            <div class="receipt-label" style="margin:0;">Total Fare Paid</div>
+          </div>
+          <div class="receipt-val" id="rc-fare" style="font-size:18px;color:var(--accent);font-weight:800;">₹0.00</div>
+        </div>
+
+        <!-- Branded Footer Signature -->
+        <div class="receipt-footer">
+          <div style="font-weight:700;" id="rc-sig-block">Ticket Booking Services — Jigar Mehta</div>
+          <div style="font-size:10px;opacity:0.8;margin-top:4px;">* Wish you a happy and safe journey! Thank you for booking with us. *</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('receiptModal')">Close</button>
+      <button class="btn btn-accent btn-sm" onclick="printReceipt()"><i class="fas fa-print"></i> Print / PDF</button>
+    </div>
+  </div>
+</div>
 
 <!-- ════ COMMAND PALETTE (Ctrl+K) ════ -->
 <div id="cmd-palette-overlay">
@@ -2883,9 +3231,9 @@ tbody tr.pnr-dup td:nth-child(8) input{background:#2a1500!important;border-color
 
       <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Navigation</div>
       <div class="shortcut-grid">
+        <div class="shortcut-item"><span class="shortcut-desc">Dashboard</span><div style="display:flex;gap:4px;"><span class="shortcut-key">Alt+D</span><span style="color:var(--text3);font-size:11px;align-self:center;">or</span><span class="shortcut-key">G→D</span></div></div>
         <div class="shortcut-item"><span class="shortcut-desc">Order Calendar</span><div style="display:flex;gap:4px;"><span class="shortcut-key">Alt+C</span><span style="color:var(--text3);font-size:11px;align-self:center;">or</span><span class="shortcut-key">G→C</span></div></div>
         <div class="shortcut-item"><span class="shortcut-desc">ID Manager</span><div style="display:flex;gap:4px;"><span class="shortcut-key">Alt+I</span><span style="color:var(--text3);font-size:11px;align-self:center;">or</span><span class="shortcut-key">G→I</span></div></div>
-        <div class="shortcut-item"><span class="shortcut-desc">Train Tools</span><div style="display:flex;gap:4px;"><span class="shortcut-key">Alt+T</span><span style="color:var(--text3);font-size:11px;align-self:center;">or</span><span class="shortcut-key">G→T</span></div></div>
         <div class="shortcut-item"><span class="shortcut-desc">PNR Status</span><div style="display:flex;gap:4px;"><span class="shortcut-key">Alt+P</span><span style="color:var(--text3);font-size:11px;align-self:center;">or</span><span class="shortcut-key">G→P</span></div></div>
         <div class="shortcut-item"><span class="shortcut-desc">Live Running</span><div style="display:flex;gap:4px;"><span class="shortcut-key">Alt+L</span><span style="color:var(--text3);font-size:11px;align-self:center;">or</span><span class="shortcut-key">G→L</span></div></div>
         <div class="shortcut-item"><span class="shortcut-desc">Seat Availability</span><div style="display:flex;gap:4px;"><span class="shortcut-key">Alt+A</span><span style="color:var(--text3);font-size:11px;align-self:center;">or</span><span class="shortcut-key">G→A</span></div></div>
@@ -3016,13 +3364,14 @@ tbody tr.pnr-dup td:nth-child(8) input{background:#2a1500!important;border-color
 // These are the owner defaults. Agents can override via Settings.
 // ═══════════════════════════════════════════════════════
 const RMS_DEFAULTS = {
+  version:    'V12',
   storeName:  'Ravi Medical & General Store',
   agentName:  'Jigar Mehta',
   contact:    '9898393487',
   tagline:    'Your One Stop Shop',
   folderUrl:  'https://drive.google.com/drive/folders/1wqw1iOdJa99WNKkhJjhuaEkjYJKTbIFv',
   sheetUrl:   'https://docs.google.com/spreadsheets/d/1fwsyNd6hP2ej3U3NLT2BBvnGj9lBsyOswnAEatt69V0/edit?gid=1465448688#gid=1465448688',
-  gasUrl:     'https://script.google.com/macros/s/AKfycbxUc5bhNl1VR51yd0_FysWay4KGfGJslBTB4lf3de3yymh1q6sJC2pr-wrSOqLepTqbdQ/exec',
+  gasUrl:     'https://script.google.com/macros/s/AKfycbyXVoJQ3EyZCLcYmEVbKvLBzav6mC4BZLv0xv9czK0Pf2gDgDXAq4pWTmbqdeCeVvsgUQ/exec',
   waSignature:'Ticket Booking Services — Jigar Mehta — 9898393487',
 };
 
@@ -3032,11 +3381,11 @@ const RMS_DEFAULTS = {
 const S = {
   creds:      loadJson('rms_creds', []),
   calLinks:   loadJson('rms_calLinks', {}),
-  gasUrl:     localStorage.getItem('rms_gasUrl')    || 'https://script.google.com/macros/s/AKfycbxUc5bhNl1VR51yd0_FysWay4KGfGJslBTB4lf3de3yymh1q6sJC2pr-wrSOqLepTqbdQ/exec',
+  gasUrl:     localStorage.getItem('rms_gasUrl')    || 'https://script.google.com/macros/s/AKfycbyXVoJQ3EyZCLcYmEVbKvLBzav6mC4BZLv0xv9czK0Pf2gDgDXAq4pWTmbqdeCeVvsgUQ/exec',
   geminiKey:  localStorage.getItem('rms_geminiKey') || '',
   lastSynced: localStorage.getItem('rms_lastSynced')|| null,
   theme:      localStorage.getItem('rms_theme')     || 'midnight',
-  lastPage:   localStorage.getItem('rms_lastPage')  || 'calendar',
+  lastPage:   localStorage.getItem('rms_lastPage')  || 'dashboard',
   sidebarCollapsed: localStorage.getItem('rms_sbCollapsed') === 'true',
   sheetId:    localStorage.getItem('rms_sheetId')   || '',
   sheetUrl:   localStorage.getItem('rms_sheetUrl')  || 'https://docs.google.com/spreadsheets/d/1fwsyNd6hP2ej3U3NLT2BBvnGj9lBsyOswnAEatt69V0/edit?gid=1465448688#gid=1465448688',
@@ -3133,11 +3482,12 @@ function navTo(page) {
   document.getElementById('page-'+page)?.classList.add('active');
   const navEl = document.querySelector(`.sb-nav-item[data-page="${page}"]`);
   if(navEl) navEl.classList.add('active');
-  const titles = {calendar:'Order Calendar', ids:'ID Manager', pnr:'PNR Status', live:'Live Running Status', avail:'Seat Availability', batch:'PDF Batch Processor', settings:'Settings'};
+  const titles = {dashboard:'Analytics Dashboard', calendar:'Order Calendar', ids:'ID Manager', pnr:'PNR Status', live:'Live Running Status', avail:'Seat Availability', batch:'PDF Batch Processor', settings:'Settings'};
   document.getElementById('topbar-title').textContent = titles[page]||page;
   document.getElementById('fab').style.display = page==='ids'?'flex':'none';
   S.lastPage = page;
   localStorage.setItem('rms_lastPage', page);
+  if(page==='dashboard') renderDashboard();
   if(page==='calendar') renderCalendar();
   if(page==='ids')      { renderIdTable(); renderIdCards(); }
   if(page==='batch')    { initBatchPage(); }
@@ -3451,34 +3801,29 @@ async function checkDeltaOnLoad() {
 }
 
 function showDeltaModal(sn, an, full) {
-  document.getElementById('deltaSubtitle').textContent =
-    `Found ${sn.length+an.length} difference(s) between local data and Google Sheets. Review and decide:`;
-  const dRow = c => `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 12px;border-bottom:1px solid var(--border);font-size:12px;">
-    <span style="font-weight:700;font-family:'JetBrains Mono',monospace;">${esc(c.username)}</span>
-    <span style="color:var(--text2);">${esc(c.name||'')}</span>
-    <span class="badge ${c.status==='verified'?'b-green':c.status==='disabled'?'b-red':'b-yellow'}">${c.status||''}</span>
-  </div>`;
-  if(sn.length) { document.getElementById('deltaSheetSec').style.display=''; document.getElementById('deltaSheetList').innerHTML =sn.map(dRow).join(''); document.getElementById('deltaSheetOnly').style.display=''; }
-  if(an.length) { document.getElementById('deltaAppSec').style.display='';   document.getElementById('deltaAppList').innerHTML =an.map(dRow).join('');   document.getElementById('deltaAppOnly').style.display=''; }
-  S.deltaPending = {sn,an,full};
+  S.deltaPending = { sn, an, full };
+  document.getElementById('deltaSubtitle').textContent = `Newer or different credential records (${sn.length + an.length} change(s)) detected on your Google Sheet. Do you want to update your local app data to match the Google Sheet?`;
   openModal('deltaModal');
 }
 
-document.getElementById('deltaDismiss')?.addEventListener('click',  ()=>{ closeModal('deltaModal'); S.deltaPending=null; toast('Dismissed.','i'); });
-document.getElementById('deltaSheetOnly')?.addEventListener('click', async ()=>{
-  const {sn}=S.deltaPending; const m={}; S.creds.forEach(c=>m[c.id]=c); sn.forEach(c=>m[c.id]=c);
-  S.creds=Object.values(m); saveLocal(); renderIdTable(); renderIdCards();
-  closeModal('deltaModal'); S.deltaPending=null; toast(`Pulled ${sn.length} from Sheet.`);
+document.getElementById('deltaDismiss')?.addEventListener('click', () => {
+  closeModal('deltaModal');
+  S.deltaPending = null;
+  toast('Keeping local version.', 'i');
 });
-document.getElementById('deltaAppOnly')?.addEventListener('click',  async ()=>{
-  const {an}=S.deltaPending; closeModal('deltaModal'); S.deltaPending=null;
-  await syncToSheet(S.creds); toast(`Pushed ${an.length} local change(s).`);
-});
-document.getElementById('deltaAcceptAll')?.addEventListener('click', async ()=>{
-  const {sn,an,full}=S.deltaPending; closeModal('deltaModal'); S.deltaPending=null;
-  const m={}; S.creds.forEach(c=>m[c.id]=c); full.forEach(c=>{if(!m[c.id])m[c.id]=c;});
-  sn.forEach(c=>m[c.id]=c); S.creds=Object.values(m);
-  saveLocal(); renderIdTable(); renderIdCards(); await syncToSheet(S.creds); toast('All synced!');
+
+document.getElementById('deltaAcceptAll')?.addEventListener('click', async () => {
+  const { full } = S.deltaPending;
+  closeModal('deltaModal');
+  S.deltaPending = null;
+  if (full && Array.isArray(full)) {
+    S.creds = full;
+    saveLocal();
+    renderIdTable();
+    renderIdCards();
+    updateSyncUI();
+    toast('Credentials updated from Google Sheet!', 's');
+  }
 });
 
 function selectConflict(side) {
@@ -4375,7 +4720,146 @@ document.getElementById('doc-close')?.addEventListener('click', closeDocViewer);
 document.getElementById('doc-open-tab')?.addEventListener('click',  ()=>window.open(_docUrl,'_blank'));
 document.getElementById('doc-open-tab2')?.addEventListener('click', ()=>window.open(_docUrl,'_blank'));
 
+// ═══════════════════════════════════════════════════════
+// DASHBOARD OPERATIONAL STATS SYSTEM
+// ═══════════════════════════════════════════════════════
+function renderDashboard() {
+  const idCount = S.creds.length;
+  const genuineCount = S.creds.filter(c => c.fakeGenuine === 'genuine' || !c.fakeGenuine).length;
+  const activeIdsStr = `${genuineCount} / ${idCount}`;
+  setAllText('#dash-ids-val', activeIdsStr);
 
+  let batchTickets = [];
+  try {
+    const rawSess = localStorage.getItem('irctc_session_tickets');
+    if (rawSess) {
+      batchTickets = JSON.parse(rawSess);
+    }
+  } catch(e) {
+    console.error('Error loading session tickets for dashboard', e);
+  }
+
+  if (typeof tickets !== 'undefined' && Array.isArray(tickets) && tickets.length > 0) {
+    batchTickets = tickets;
+  }
+
+  const ticketCount = batchTickets.length;
+  setAllText('#dash-bookings-val', ticketCount);
+
+  let totalFare = 0;
+  let totalComm = 0;
+  const routesCount = {};
+
+  batchTickets.forEach(t => {
+    const f = parseFloat(String(t.totalFare || '0').replace(/[^0-9.]/g, ''));
+    if (!isNaN(f)) totalFare += f;
+
+    const c = parseFloat(String(t.commission || '0').replace(/[^0-9.]/g, ''));
+    if (!isNaN(c)) totalComm += c;
+
+    if (t.fromStation && t.toStation) {
+      const route = `${t.fromStation.toUpperCase()} ➔ ${t.toStation.toUpperCase()}`;
+      routesCount[route] = (routesCount[route] || 0) + 1;
+    }
+  });
+
+  setAllText('#dash-fare-val', `₹${totalFare.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+  setAllText('#dash-comm-val', `₹${totalComm.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+
+  const gasEl = document.getElementById('dash-health-gas');
+  if (gasEl) {
+    gasEl.className = S.gasUrl ? 'badge b-green' : 'badge b-red';
+    gasEl.textContent = S.gasUrl ? 'Yes' : 'No';
+  }
+  const qEl = document.getElementById('dash-health-queue');
+  if (qEl) {
+    const qCount = S.offlineQueue.length;
+    qEl.className = qCount > 0 ? 'badge b-yellow' : 'badge b-gray';
+    qEl.textContent = `${qCount} pending`;
+  }
+  const backupEl = document.getElementById('dash-health-backup');
+  if (backupEl) {
+    backupEl.textContent = S.lastBackup ? new Date(S.lastBackup).toLocaleDateString('en-IN') : 'Never';
+  }
+  const linksEl = document.getElementById('dash-health-links');
+  if (linksEl) {
+    linksEl.textContent = `${Object.keys(S.calLinks).length} links`;
+  }
+
+  const sortedRoutes = Object.entries(routesCount).sort((a,b) => b[1] - a[1]).slice(0, 5);
+  const routeBody = document.getElementById('dash-routes-list');
+  if (routeBody) {
+    if (sortedRoutes.length === 0) {
+      routeBody.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);">No ticket routes detected yet. Drop IRCTC PDFs in Batch Processor.</div>';
+    } else {
+      const maxCount = sortedRoutes[0][1];
+      routeBody.innerHTML = sortedRoutes.map(([route, count]) => {
+        const pct = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
+        return `
+          <div class="route-item">
+            <div class="route-info">
+              <span>${esc(route)}</span>
+              <span style="color:var(--accent); font-weight: 800;">${count} travel(s)</span>
+            </div>
+            <div class="route-bar-bg">
+              <div class="route-bar" style="width: ${pct}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+}
+
+// Add refresh trigger listener
+document.getElementById('dash-refresh-btn')?.addEventListener('click', () => {
+  renderDashboard();
+  toast('Operational statistics updated!');
+});
+
+// ═══════════════════════════════════════════════════════
+// RECEIPT GENERATOR SYSTEM
+// ═══════════════════════════════════════════════════════
+let _currentReceiptTicket = null;
+
+function openReceiptModal(id) {
+  const t = tickets.find(x => x.id === id);
+  if (!t) return;
+  _currentReceiptTicket = t;
+
+  const p = S.profile || {};
+  document.getElementById('rc-store-name').textContent = p.storeName || 'Ravi Medical & General Store';
+  document.getElementById('rc-tagline').textContent = p.tagline || 'Your One Stop Shop';
+  document.getElementById('rc-contact-info').textContent = p.contact ? 'Contact: ' + p.contact : '';
+  document.getElementById('rc-sig-block').textContent = p.waSignature || (p.agentName ? `Ticket Booking Services — ${p.agentName}` : 'Ticket Booking Services');
+
+  document.getElementById('rc-pnr').textContent = t.pnr || 'N/A';
+  document.getElementById('rc-booking-date').textContent = t.bookingDate || 'N/A';
+  
+  const trainNum = t._raw ? (t._raw.match(/Train\s*(?:No\.?|#|:)?\s*(\d{5})/i) || ['', ''])[1] : '';
+  const trainName = t._raw ? (t._raw.match(/Train\s+Name\s*:?\s*([A-Z0-9\s-]+?)(?:\n|Date|$)/i) || ['', ''])[1].trim() : '';
+  const classVal = t._raw ? (t._raw.match(/Class\s*:?\s*([A-Z0-9]+)\b/i) || ['', ''])[1] : '';
+  
+  let details = '';
+  if (trainNum) details += `${trainNum}`;
+  if (trainName) details += ` - ${trainName}`;
+  if (classVal) details += ` (${classVal})`;
+  document.getElementById('rc-train-details').textContent = details || 'N/A';
+  
+  document.getElementById('rc-journey-date').textContent = t.travelDate || 'N/A';
+  document.getElementById('rc-from').textContent = t.fromStation || 'N/A';
+  document.getElementById('rc-to').textContent = t.toStation || 'N/A';
+  document.getElementById('rc-passenger-name').textContent = t.passengerName || 'N/A';
+  
+  const fare = parseFloat(String(t.totalFare || '0').replace(/[^0-9.]/g, ''));
+  document.getElementById('rc-fare').textContent = `₹${isNaN(fare) ? '0.00' : fare.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+  openModal('receiptModal');
+}
+
+function printReceipt() {
+  window.print();
+}
 
 // ═══════════════════════════════════════════════════════
 // PROFILE SYSTEM
@@ -5072,7 +5556,7 @@ document.getElementById('wzNext')?.addEventListener('click', () => {
   document.getElementById('calcTargetDate').value =def.toISOString().split('T')[0];
 
   // Restore last page
-  navTo(S.lastPage||'calendar');
+  navTo(S.lastPage||'dashboard');
 
   // Apply profile
   applyProfile();
@@ -6786,6 +7270,7 @@ function renderRow(row, data) {
     <td><span class="badge ${badgeCls}" ${badgeClick} ${badgeTip}>${badgeTxt}</span></td>
     <td class="row-acts">
       <button class="row-btn" onclick="openPreview(${data.id})" title="Preview">👁️</button>
+      <button class="row-btn" onclick="openReceiptModal(${data.id})" title="Branded Receipt" style="color:var(--accent); font-weight:bold;">📄</button>
       <button class="row-btn" onclick="reExtractRow(${data.id})" title="Re-extract">🔄</button>
       <button class="row-btn" onclick="openSplit(${data.id})" title="Split passengers">✂️</button>
       <button class="row-btn del" onclick="deleteRow(${data.id})" title="Delete">🗑️</button>
@@ -7408,12 +7893,12 @@ document.addEventListener('keydown', e => {
   if(e.altKey) {
     e.preventDefault();
     switch(e.key.toLowerCase()) {
+      case 'd': navTo('dashboard'); break;
       case 'c': navTo('calendar'); break;
       case 'i': navTo('ids'); break;
-      case 't': toggleTrainGroup(); break;
-      case 'p': openTrainGroup(); navTo('pnr'); break;
-      case 'l': openTrainGroup(); navTo('live'); break;
-      case 'a': openTrainGroup(); navTo('avail'); break;
+      case 'p': navTo('pnr'); break;
+      case 'l': navTo('live'); break;
+      case 'a': navTo('avail'); break;
       case 'b': navTo('batch'); break;
       case 's': navTo('settings'); break;
       case 'n': // Alt+N = new (context-aware)
@@ -7428,12 +7913,12 @@ document.addEventListener('keydown', e => {
   if(_gMode) {
     _gMode = false; clearTimeout(_gTimer);
     switch(e.key.toLowerCase()) {
+      case 'd': navTo('dashboard'); break;
       case 'c': navTo('calendar'); break;
       case 'i': navTo('ids'); break;
-      case 't': toggleTrainGroup(); break;
-      case 'p': openTrainGroup(); navTo('pnr'); break;
-      case 'l': openTrainGroup(); navTo('live'); break;
-      case 'a': openTrainGroup(); navTo('avail'); break;
+      case 'p': navTo('pnr'); break;
+      case 'l': navTo('live'); break;
+      case 'a': navTo('avail'); break;
       case 'b': navTo('batch'); break;
       case 's': navTo('settings'); break;
     }
@@ -7512,40 +7997,14 @@ function parseCalendarDate(q) {
   return null;
 }
 
-// ── Train group toggle ──
-let _trainOpen = false;
-function toggleTrainGroup(){
-  _trainOpen = !_trainOpen;
-  const sub = document.getElementById('sb-train-sub');
-  const arrow = document.getElementById('sb-train-arrow');
-  if(sub) sub.classList.toggle('open', _trainOpen);
-  if(arrow) arrow.style.transform = _trainOpen ? 'rotate(180deg)' : '';
-}
-function openTrainGroup(){
-  _trainOpen = true;
-  const sub = document.getElementById('sb-train-sub');
-  const arrow = document.getElementById('sb-train-arrow');
-  if(sub) sub.classList.add('open');
-  if(arrow) arrow.style.transform = 'rotate(180deg)';
-}
-
-document.getElementById('sb-train-toggle')?.addEventListener('click', toggleTrainGroup);
-
-// When a train sub-item is clicked, nav to it
-document.querySelectorAll('#sb-train-sub .sb-nav-item[data-page]').forEach(item => {
-  item.addEventListener('click', () => {
-    openTrainGroup();
-    navTo(item.dataset.page);
-  });
-});
-
 // ── Command Palette ──
 const CMD_ITEMS = [
+  {label:'Dashboard', desc:'View operational stats & health', page:'dashboard', icon:'fa-chart-line', kbd:'Alt+D / G→D'},
   {label:'Order Calendar', desc:'View & manage booking links', page:'calendar', icon:'fa-calendar-alt', kbd:'Alt+C / G→C'},
   {label:'ID Manager', desc:'IRCTC credentials', page:'ids', icon:'fa-id-card', kbd:'Alt+I / G→I'},
   {label:'PNR Status', desc:'Check PNR', page:'pnr', icon:'fa-ticket-alt', kbd:'Alt+P / G→P'},
   {label:'Live Running', desc:'Track train location', page:'live', icon:'fa-satellite-dish', kbd:'Alt+L / G→L'},
-  {label:'Seat Availability', desc:'Check seats between stations', page:'avail', icon:'fa-chair', kbd:''},
+  {label:'Seat Availability', desc:'Check seats between stations', page:'avail', icon:'fa-chair', kbd:'Alt+A / G→A'},
   {label:'PDF Batch Processor', desc:'Upload & submit IRCTC PDFs', page:'batch', icon:'fa-file-pdf', kbd:'Alt+B / G→B'},
   {label:'PNR Check  — type: pnr 1234567890', desc:'Paste PNR + open PNR status directly', icon:'fa-ticket-alt', kbd:'', action:()=>{openCmdPalette();setTimeout(()=>{const i=document.getElementById('cmd-input');if(i){i.value='pnr ';i.focus();}},50);}},
   {label:'Live Train — type: live 12345', desc:'Enter train number + track live status directly', icon:'fa-satellite-dish', kbd:'', action:()=>{openCmdPalette();setTimeout(()=>{const i=document.getElementById('cmd-input');if(i){i.value='live ';i.focus();}},50);}},
