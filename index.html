@@ -3426,6 +3426,12 @@ async function performTwoWaySync() {
 
 async function checkDeltaOnLoad() {
   if(!S.gasUrl) return;
+  // Fix any local long-format date keys first (one-time migration)
+  cleanupCalendarDateKeys();
+  // Pull calendar silently on every load
+  const sheetCalLinks = await loadCalendarFromSheet();
+  if(sheetCalLinks) mergeCalendarLinks(sheetCalLinks, true);
+
   const sheetData = await loadFromSheet();
   if(!sheetData) return;
   const aMap={}, sMap={};
@@ -3604,18 +3610,75 @@ async function loadCalendarFromSheet() {
   try {
     const res = await fetch(S.gasUrl+'?action=read_calendar', {method:'GET',redirect:'follow'});
     if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    if(data&&data.success) return data.calLinks || data.calendar || {};
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch(pe) {
+      // GAS sometimes returns HTML on redirect — extract JSON
+      const m = text.match(/\{[\s\S]*\}/);
+      if(m) data = JSON.parse(m[0]);
+      else throw new Error('Non-JSON response from GAS');
+    }
+    if(data && data.success) {
+      addSyncLog('Calendar pulled — '+(data.count||0)+' entries','ok','CALENDAR');
+      return data.calLinks || data.calendar || {};
+    }
+    if(data && data.error) throw new Error(data.error);
   } catch(e) {
-    addSyncLog('Calendar pull skipped — '+e.message,'warn','CALENDAR');
+    addSyncLog('Calendar pull failed — '+e.message,'warn','CALENDAR');
+    console.warn('[RMS] loadCalendarFromSheet error:', e);
   }
   return null;
 }
+// ── Normalize date key: converts any format to YYYY-MM-DD ─────────────
+function normalizeDateKey(d) {
+  if(!d) return d;
+  // Already correct: YYYY-MM-DD
+  if(/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  // Convert JS Date.toString() like "Fri Apr 03 2026 00:00:00 GMT+0530..."
+  try {
+    const dt = new Date(d);
+    if(!isNaN(dt.getTime())) {
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth()+1).padStart(2,'0');
+      const day = String(dt.getDate()).padStart(2,'0');
+      return `${y}-${m}-${day}`;
+    }
+  } catch(e) {}
+  return d; // return as-is if can't parse
+}
+
+// ── Fix any existing local calendar links that have long-format date keys ──
+function cleanupCalendarDateKeys() {
+  const longKeys = Object.keys(S.calLinks).filter(k => !/^\d{4}-\d{2}-\d{2}$/.test(k));
+  if(!longKeys.length) return;
+  console.log('[RMS] Normalizing', longKeys.length, 'calendar date keys...');
+  let fixed = 0;
+  longKeys.forEach(k => {
+    const norm = normalizeDateKey(k);
+    if(norm === k) return; // couldn't normalize
+    const existing = S.calLinks[norm];
+    const incoming = S.calLinks[k];
+    // Keep whichever is newer
+    if(!existing || new Date(incoming?.updated||0) >= new Date(existing?.updated||0)) {
+      S.calLinks[norm] = incoming;
+    }
+    delete S.calLinks[k];
+    fixed++;
+  });
+  if(fixed) {
+    saveLocal(); renderCalendar();
+    addSyncLog('Fixed '+fixed+' calendar date key(s) from long format to YYYY-MM-DD','ok','CALENDAR');
+    console.log('[RMS] Fixed', fixed, 'calendar keys');
+  }
+}
+
 function mergeCalendarLinks(remote, silent=false) {
   if(!remote || typeof remote !== 'object') return false;
   let changed=0;
-  Object.entries(remote).forEach(([date, incoming]) => {
+  Object.entries(remote).forEach(([rawDate, incoming]) => {
     if(!incoming || !incoming.url) return;
+    const date = normalizeDateKey(rawDate); // normalize long-format keys
+    if(!date) return;
     const local = S.calLinks[date];
     const localTime = new Date(local?.updated||0).getTime();
     const remoteTime = new Date(incoming.updated||0).getTime();
@@ -3636,17 +3699,22 @@ async function syncCalendarToSheet() {
   const savingEl=document.createElement('div');
   savingEl.className='cal-chip cal-saving';savingEl.id='cal-saving-chip';
   savingEl.innerHTML='<i class="fas fa-spinner fa-spin"></i> Saving…';
-  stats.appendChild(savingEl);
+  if(stats) stats.appendChild(savingEl);
   try{
-    // Only sync entries that have a URL
+    // Normalize all date keys before sending, only send entries with a URL
     const _calToSync = {};
-    Object.entries(S.calLinks).forEach(([d,lnk]) => { if(lnk && lnk.url) _calToSync[d] = lnk; });
+    Object.entries(S.calLinks).forEach(([d,lnk]) => {
+      if(lnk && lnk.url) {
+        const norm = normalizeDateKey(d);
+        if(norm) _calToSync[norm] = lnk;
+      }
+    });
     const result = await gasPost(S.gasUrl, { action:'write_calendar', calLinks:_calToSync, source:'app' });
     if(!result || result.success===false) throw new Error(result?.error || 'Calendar sync was not accepted by GAS');
     if(result.unconfirmed) addSyncLog('Calendar sync sent, confirmation unavailable','warn','CALENDAR');
     S.lastSynced=new Date().toISOString();
     localStorage.setItem('rms_lastSynced',S.lastSynced);
-    addSyncLog('Calendar links synced — '+Object.keys(S.calLinks).length+' links','ok','CALENDAR');
+    addSyncLog('Calendar links synced — '+Object.keys(_calToSync).length+' links ('+Object.keys(S.calLinks).length+' total)','ok','CALENDAR');
     updateSyncUI();
   }catch(e){
     toast('Calendar sync failed: '+e.message,'e');
@@ -3774,6 +3842,7 @@ function saveBulkRow(idx) {
   else if(isUrl(d.url)) { S.calLinks[d.date]={url:d.url,title:d.title,updated:new Date().toISOString()}; }
   else { toast('Invalid URL for '+d.date,'e'); return; }
   saveLocal(); renderCalendar(); toast('Saved '+d.date);
+  syncCalendarToSheet(); // ← push to Google Sheet
 }
 
 function updateBulkCount() {
