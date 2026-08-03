@@ -619,7 +619,7 @@ a{color:var(--accent);text-decoration:none;}
   border:2px solid var(--accent) !important;
   background:rgba(13,148,136,.04) !important;
 }
-.cal-cell.is-sun .cell-dn{color:var(--red);}
+.cal-cell.is-sun .cell-dn, .cal-cell.is-sun .cell-date-num{color:var(--red);}
 .cal-cell.other-month{opacity:.45;background:var(--bg2);}
 .cal-cell.has-link{
   background:rgba(16,185,129,.07) !important;
@@ -634,8 +634,15 @@ a{color:var(--accent);text-decoration:none;}
 .cal-cell.h-optional{border-top:3px solid var(--blue) !important;}
 
 .cell-dn{
-  font-size:15px;font-weight:700;
-  line-height:1;margin-bottom:2px;
+  font-size:16px;font-weight:800;
+  line-height:1.2;margin-bottom:3px;
+  display:flex;align-items:center;gap:4px;
+  flex-wrap:nowrap;
+}
+.cell-date-num{
+  font-size:16px;font-weight:800;
+  letter-spacing:-0.01em;
+  white-space:nowrap;
 }
 .cell-today-dot{
   display:inline-block;width:5px;height:5px;
@@ -663,12 +670,13 @@ a{color:var(--accent);text-decoration:none;}
 
 /* ── Cal doc badge — small Google Docs icon indicator on linked tiles ── */
 .cal-doc-badge{
-  position:absolute;top:3px;left:3px;
-  width:16px;height:16px;border-radius:4px;
+  position:relative;top:auto;left:auto;
+  width:18px;height:18px;min-width:18px;border-radius:4px;
   background:var(--green);color:#fff;
-  font-size:8px;display:flex;align-items:center;justify-content:center;
-  opacity:.85;box-shadow:0 1px 4px rgba(0,0,0,.2);
+  font-size:9px;display:inline-flex;align-items:center;justify-content:center;
+  opacity:.9;box-shadow:0 1px 3px rgba(0,0,0,.2);
   transition:opacity .15s,transform .15s;
+  flex-shrink:0;
 }
 .cal-cell:hover .cal-doc-badge{opacity:1;transform:scale(1.1);}
 
@@ -4062,21 +4070,57 @@ function renderCalendar() {
       +(hol?' h-'+hol.type:'');
     cell.dataset.dateStr=ds;
 
-    let html = `<div class="cell-dn">${dn}${ds===todayStr?'<span class="cell-today-dot"></span>':''}</div>`;
-    // ── Google Doc badge on linked tiles ──
-    if(lnk) html += `<div class="cal-doc-badge" title="${esc(lnk.title||'Open Doc')}"><i class="fas fa-file-alt"></i></div>`;
+    const SHORT_MONTHS_LIST = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const monthShort = SHORT_MONTHS_LIST[dt.getMonth()];
+    const dayPadded = String(dn).padStart(2, '0');
+    const dateTextDisplay = `${dayPadded} ${monthShort}`;
+
+    let html = `<div class="cell-dn">`;
+    if(lnk) html += `<span class="cal-doc-badge" title="${esc(lnk.title||'Open Doc')}"><i class="fas fa-file-alt"></i></span>`;
+    html += `<span class="cell-date-num">${dateTextDisplay}</span>`;
+    if(ds===todayStr) html += `<span class="cell-today-dot"></span>`;
+    html += `</div>`;
+
     if(hol) html += `<div class="cell-holiday" style="color:${hol.color}">${esc(hol.name)}</div>`;
     if(ds===bookingStr) html += `<div class="cell-booking-badge">OPEN</div>`;
-    if(lnk) html += `<div class="cell-link"><i class="fas fa-external-link-alt"></i> ${esc(lnk.title||'Open Doc')}</div>`;
-    else if(!other) html += `<div class="cell-link" style="color:var(--text3);opacity:.5;"><i class="fas fa-plus"></i> Add Doc</div>`;
+
+    let cleanLinkTitle = 'Open Doc';
+    if(lnk) {
+      if(lnk.title && !lnk.title.includes('00:00:00') && !lnk.title.includes('GMT')) {
+        cleanLinkTitle = lnk.title;
+      }
+      html += `<div class="cell-link"><i class="fas fa-external-link-alt"></i> ${esc(cleanLinkTitle)}</div>`;
+    } else if(!other) {
+      html += `<div class="cell-link" style="color:var(--text3);opacity:.5;"><i class="fas fa-plus"></i> Add Doc</div>`;
+    }
 
     cell.innerHTML = html;
+
+// ── Helper to ensure Google Doc URLs open smoothly across multi-account sessions & mobile ──
+function formatGoogleDocShareUrl(url) {
+  if(!url) return '';
+  let cleanUrl = String(url).trim();
+  if(cleanUrl.includes('docs.google.com/document') && !cleanUrl.includes('usp=sharing')) {
+    if(cleanUrl.includes('?')) {
+      cleanUrl += '&usp=sharing';
+    } else {
+      cleanUrl += '?usp=sharing';
+    }
+  }
+  return cleanUrl;
+}
+
+function openDocUrl(url) {
+  if(!url) return;
+  const targetUrl = formatGoogleDocShareUrl(url);
+  window.open(targetUrl, '_blank');
+}
 
     // ── Click handler: open linked doc OR auto-create new one ──
     cell.addEventListener('click', (e) => {
       const _lnk=S.calLinks[ds];
       if(_lnk && _lnk.url) {
-        window.open(_lnk.url,'_blank');
+        openDocUrl(_lnk.url);
       } else {
         autoCreateDoc(ds, dt);
       }
@@ -4205,7 +4249,7 @@ async function autoCreateDoc(ds, dt) {
     toast(`✅ Doc "${title}" created & linked!`, 's');
 
     // ── Open the new doc ──
-    window.open(url, '_blank');
+    openDocUrl(url);
 
     // ── Push a lightweight calendar sync ──
     syncCalendarToSheet();
@@ -4256,7 +4300,7 @@ function openDateOptionsModal(ds, dt) {
   };
 
   if(lnk && lnk.url) {
-    addBtn('fas fa-external-link-alt', 'Open Google Doc', 'primary', ()=>window.open(lnk.url,'_blank'));
+    addBtn('fas fa-external-link-alt', 'Open Google Doc', 'primary', ()=>openDocUrl(lnk.url));
     addBtn('fas fa-copy', 'Copy Link', '', ()=>{
       navigator.clipboard?.writeText(lnk.url).then(()=>toast('Link copied!','s')).catch(()=>toast('Copy not supported','w'));
     });
