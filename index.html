@@ -4036,6 +4036,32 @@ function renderCalStats() {
   `;
 }
 
+// ── Helper to ensure Google Doc URLs open smoothly across multi-account sessions & mobile ──
+function formatGoogleDocShareUrl(url) {
+  if(!url) return '';
+  let cleanUrl = String(url).trim();
+  if(cleanUrl.includes('docs.google.com/open')) {
+    const idMatch = cleanUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if(idMatch && idMatch[1]) {
+      return `https://docs.google.com/document/d/${idMatch[1]}/edit?usp=sharing`;
+    }
+  }
+  if(cleanUrl.includes('docs.google.com/document') && !cleanUrl.includes('usp=sharing')) {
+    if(cleanUrl.includes('?')) {
+      cleanUrl += '&usp=sharing';
+    } else {
+      cleanUrl += '?usp=sharing';
+    }
+  }
+  return cleanUrl;
+}
+
+function openDocUrl(url) {
+  if(!url) return;
+  const targetUrl = formatGoogleDocShareUrl(url);
+  window.open(targetUrl, '_blank');
+}
+
 function renderCalendar() {
   renderCalStats();
   const y=S.calDate.getFullYear(), m=S.calDate.getMonth();
@@ -4095,26 +4121,6 @@ function renderCalendar() {
     }
 
     cell.innerHTML = html;
-
-// ── Helper to ensure Google Doc URLs open smoothly across multi-account sessions & mobile ──
-function formatGoogleDocShareUrl(url) {
-  if(!url) return '';
-  let cleanUrl = String(url).trim();
-  if(cleanUrl.includes('docs.google.com/document') && !cleanUrl.includes('usp=sharing')) {
-    if(cleanUrl.includes('?')) {
-      cleanUrl += '&usp=sharing';
-    } else {
-      cleanUrl += '?usp=sharing';
-    }
-  }
-  return cleanUrl;
-}
-
-function openDocUrl(url) {
-  if(!url) return;
-  const targetUrl = formatGoogleDocShareUrl(url);
-  window.open(targetUrl, '_blank');
-}
 
     // ── Click handler: open linked doc OR auto-create new one ──
     cell.addEventListener('click', (e) => {
@@ -4230,8 +4236,38 @@ async function autoCreateDoc(ds, dt) {
       else throw new Error('Non-JSON response from GAS: ' + text.substring(0,200));
     }
 
+    // ── Fallback attempt if GAS backend expects action=create_document ──
+    if(result && result.success === false && result.error && String(result.error).includes('Unknown GET action')) {
+      console.warn('[RMS] Primary create_doc action unknown, trying fallback create_document...');
+      const fallbackParams = new URLSearchParams({
+        action:         'create_document',
+        date:           ds,
+        title:          title,
+        folderUrl:      folderUrl,
+        holidayHeading: holidayHeading
+      });
+      const fbRes = await fetch(S.gasUrl + '?' + fallbackParams.toString(), { method:'GET', redirect:'follow' });
+      if(fbRes.ok) {
+        const fbText = await fbRes.text();
+        try {
+          const fbJson = JSON.parse(fbText);
+          if(fbJson && fbJson.success) result = fbJson;
+        } catch(fpe) {
+          const fbm = fbText.match(/\{[\s\S]*\}/);
+          if(fbm) {
+            const fbJson = JSON.parse(fbm[0]);
+            if(fbJson && fbJson.success) result = fbJson;
+          }
+        }
+      }
+    }
+
     if(!result || result.success === false) {
-      throw new Error(result?.error || 'Doc creation failed (GAS returned failure)');
+      const errMsg = result?.error || 'Doc creation failed (GAS returned failure)';
+      if(String(errMsg).includes('Unknown GET action')) {
+        throw new Error('GAS deployment outdated. Please re-deploy Google Apps Script to "New version".');
+      }
+      throw new Error(errMsg);
     }
 
     const url = result.url;
@@ -4248,11 +4284,15 @@ async function autoCreateDoc(ds, dt) {
     addSyncLog(`Doc created & linked: ${ds} → "${title}"`, 'ok', 'CALENDAR');
     toast(`✅ Doc "${title}" created & linked!`, 's');
 
-    // ── Open the new doc ──
-    openDocUrl(url);
-
-    // ── Push a lightweight calendar sync ──
+    // ── Push a lightweight calendar sync to Google Sheet ──
     syncCalendarToSheet();
+
+    // ── Open the new doc in new tab ──
+    try {
+      openDocUrl(url);
+    } catch(openErr) {
+      console.warn('[RMS] Could not auto-open doc popup:', openErr);
+    }
 
   } catch(err) {
     toast('Doc creation failed: ' + err.message, 'e');
@@ -4301,8 +4341,11 @@ function openDateOptionsModal(ds, dt) {
 
   if(lnk && lnk.url) {
     addBtn('fas fa-external-link-alt', 'Open Google Doc', 'primary', ()=>openDocUrl(lnk.url));
-    addBtn('fas fa-copy', 'Copy Link', '', ()=>{
+    addBtn('fas fa-copy', 'Copy Link URL', '', ()=>{
       navigator.clipboard?.writeText(lnk.url).then(()=>toast('Link copied!','s')).catch(()=>toast('Copy not supported','w'));
+    });
+    addBtn('fas fa-calendar-day', 'Copy Formatted Date', '', ()=>{
+      navigator.clipboard?.writeText(dispDate).then(()=>toast(`Copied date: ${dispDate}`,'s')).catch(()=>toast('Copy not supported','w'));
     });
     addBtn('fas fa-edit', 'Edit / Replace Link', '', ()=>openCalModal(ds,dt));
     addBtn('fas fa-redo-alt', 'Re-generate New Doc (overwrite)', '', ()=>autoCreateDoc(ds,dt));
@@ -4313,7 +4356,10 @@ function openDateOptionsModal(ds, dt) {
     });
   } else {
     addBtn('fas fa-magic', 'Auto-Create Google Doc', 'primary', ()=>autoCreateDoc(ds,dt));
-    addBtn('fas fa-link', 'Paste Existing URL', '', ()=>openCalModal(ds,dt));
+    addBtn('fas fa-link', 'Paste / Edit Link', '', ()=>openCalModal(ds,dt));
+    addBtn('fas fa-calendar-day', 'Copy Formatted Date', '', ()=>{
+      navigator.clipboard?.writeText(dispDate).then(()=>toast(`Copied date: ${dispDate}`,'s')).catch(()=>toast('Copy not supported','w'));
+    });
   }
 
   openModal('dateOptModal');
